@@ -619,6 +619,8 @@
 <script>
   const API_KEY = "AIzaSyDDR4_h-2KzNderQdUkh3oT3BMGBa57Zx4";  
   const MODEL = "gemini-2.5-flash";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycby7pDsqdsCCCpsDKSNiT4I3fnsrGy6U7Lsdcop0IkMF4cjmE5v5ymTOUm0exQqI-QbE/exec";  // ← この行を追加
+
 
   const runBtn = document.getElementById("run");
   const resetBtn = document.getElementById("reset");
@@ -634,7 +636,20 @@
     { icon: "💡", title: "AI検索での強みと機会" },
     { icon: "🚀", title: "推奨アクション" }
   ];
-
+// Googleスプレッドシートにログを送信
+  async function logToSheet(company) {
+    try {
+      await fetch(SHEET_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ company: company })
+      });
+      console.log("ログ送信完了:", company);
+    } catch (e) {
+      console.error("ログ送信エラー:", e);
+    }
+  }
   function setStatus(message, type = "") {
     if (!message) {
       statusEl.innerHTML = "";
@@ -770,6 +785,8 @@
     resultsEl.classList.remove("visible");
     resultsEl.innerHTML = "";
     ctaEl.style.display = "none";
+    // スプレッドシートにログを送信
+    logToSheet(name);  // ← この行を追加
 
     const prompt = `
 あなたはAI検索の専門家です。以下の会社名・サービス名についてWeb検索し、AI検索での表示状況を診断してください。
